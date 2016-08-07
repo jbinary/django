@@ -91,6 +91,8 @@ class DatabaseErrorWrapper(object):
                 # the connection unusable.
                 if dj_exc_type not in (DataError, IntegrityError):
                     self.wrapper.errors_occurred = True
+                if dj_exc_type in (OperationalError, InterfaceError) and not self.wrapper.in_atomic_block:
+                    self.wrapper.close()
                 six.reraise(dj_exc_type, dj_exc_value, traceback)
 
     def __call__(self, func):
